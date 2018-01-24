@@ -4,13 +4,14 @@ sc.setCheckpointDir('/user/cloudera')
 
 import os
 import numpy as np
-
-fid = open('output_kmeans.txt','w')
+# Test no Supervisado
+# Crea un archivo del nombre indicado
+fid = open('/user/cloudera/output_kmeans.txt','w')
 
 # lectura de datos de ratings
-iris_data = sc.textFile('file:///home/cloudera/iris.data')
+iris_data = sc.textFile('/user/cloudera/iris.data')
 
-# obtenemos los atributos
+# obtenemos los atributos del archivo, separamos por , los datos que estan registrados
 iris_attrib_raw = iris_data.map(lambda line: np.array([l for l in line.split(",")[:-1]]))
 
 # solo usamos los datos validos
@@ -22,9 +23,10 @@ iris_class = iris_data.map(lambda line: line.split(",")).filter(lambda x: len(x)
 # Entreno k-means
 
 # K: numero de clusters que encontrara kmeans
-K = 3
+K = 3 # especifica el grupo de datos del set de entreamieno
 
 from pyspark.mllib.clustering import KMeans
+# Aplicando prubemas con los mismos datos de entrenamiento
 model = KMeans.train(iris_attrib, k=K, maxIterations = 100)
 
 # Guardo los centros de los clusters
