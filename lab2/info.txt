@@ -1,0 +1,14 @@
+ Todo el contenido del archivo ZIP debe ser trasladado a su home (/home/cloudera).
+
+-----
+
+Primera Parte Usarán las funciones comunes de Spark para procesar y analizar datos.
+
+Segunda Parte, usando los mismos datos de la primera parte, accederán y procesarán los datos con SparkSQL.
+
+En la tercera parte, ejecutarán un algoritmo sobre datos para obtener un modelo de agrupamiento (clustering)
+
+Cuarta parte, procederán a construir un sistema que clasifica e-mails entre SPAM y NO-SPAM\
+# comandos
+scl enable python27 bash
+sudo -H pip2.7 install gensim pattern
