@@ -7,7 +7,11 @@ from pyspark import SparkContext
 t1 = time.time()
 sc = SparkContext()
 
+def generateData(dataJoined):
+  return dataJoined.sortBy(lambda x: x[1][0], ascending=False).collect()
 
+def joinData(genedateData, dataset):
+  return genedateData.join(dataset)
 # Extraemos la información o el dataset que esta en hdfs para realizar las consultas
 # Generamos los RDD's de movies y ratings
 movieText = sc.textFile('/user/cloudera/lab-spark-2/movies.dat')
@@ -43,15 +47,17 @@ pairsMovie = movieData.map(lambda vec: (vec[0], vec[1]))
 sortedData = countRating.sortBy(lambda x: x[1], ascending = False)
 
 # Generamos una partición en el dataset con las 20 mejores peliculas, generalmente entre 2-4 particiones en cada CPU
-best = sc.parallelize(sortedData.take(20))
+bestTwenty = sc.parallelize(sortedData.take(20))
+bestHundred = sc.parallelize(sortedData.take(100))
 
 # Unimos las mejores peliculas mediante el movie_id
 # Genemos un RDD con movie_id, raiting, title
-joinedData = best.join(pairsMovie)
-
+joinedDataTwenty = joinData(bestTwenty, pairsMovie)
+joinedDataHundred = joinData(bestHundred, pairsMovie)
 # Ordenamos e imprimimos joinedData ordenado de forma descendente
 
-joinedData.sortBy(lambda x: x[1][0], ascending=False).collect()
+bestTwenty = generateData(joinedDataTwenty)
+bestHundred = generateData(joinedDataHundred)
 # El valor generado es
 # (movie_id, (countRating, title)
 
