@@ -117,4 +117,5 @@ print 'El tiempo de ejecución es %s segundos' % (str(time.time()-t))
 # d) Usando la función filter de los RDD de Spark, obtenga sólo las películas con 100 o más ratings.
 hundredAverageRaiting = getBestRaiting(bestAverageRaiting)
 bestMovie = ordering(hundredAverageRaiting, True)
-bestMovie.take(10)
+hundredAverageRaiting.count() # total de las peluculas filtradas
+bestMovie.count() # peliculas filtradas
