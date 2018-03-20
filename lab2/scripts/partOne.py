@@ -1,6 +1,8 @@
 
 # coding: utf-8
-# # Parte I: Uso de funciones comunes de Spark
+# Parte I: Uso de funciones comunes de Spark
+# TODO: Se puede optimizar el ordenamiento en cada una de las busquedas
+#
 import time
 from pyspark import SparkContext
 
@@ -81,10 +83,9 @@ joinedBestRaiting = joinData(filterBestRaiting, pairsMovie)
 joinedBestRaiting.count()
 
 # -> ii ¿Cuáles son las 10 películas con menor cantidad de ratings de las películas filtradas?
-worstRaiting = ordering(bestRaiting, True)
-worstRaiting = sc.parallelize(worstRaiting.take(10))
-joinedWorstRaiting = joinData(worstRaiting, pairsMovie)
-joinedWorstRaiting.collect()
+#  ---------
+worstRaiting = ordering(joinedBestRaiting, True)
+worstRaiting.take(10)
 
 # -----------------------------------------------------------------------------------------------
 # e) Almacene en cache el RDD countRating, mediante la instrucción countRating.cache().
@@ -104,22 +105,26 @@ print 'El tiempo de ejecución es %s segundos' % (str(time.time()-t1))
 #
 averagePairsRating = ratingsData.map(lambda vec: (vec[1], int(vec[2])))
 # ¿Qué operaciones debe efectuar después de pairsRatings para que se calcule el promedio de los ratings?
-averageData = averagePairsRating.groupByKey().mapValues(lambda x: sum(x) / len(x))
+# .mapValues(lambda x: sum(x) / len(x))
+averageData = averagePairsRating.groupByKey().mapValues(lambda x: sum(x))
 bestAverageRaiting = ordering(averageData, False)
 
 # b) Muestre cuáles son las 20 películas con mayor cantidad de ratings.
 # Mencione el tiempo en segundos que demora esta operación.
 t = time.time()
-bestAverageRaiting.take(20)
+bestTwenty = joinData(sc.parallelize(bestAverageRaiting.take(bestAverageRaiting.count())), pairsMovie)
+ordering(bestTwenty, False).take(20)
 print 'El tiempo de ejecución es %s segundos' % (str(time.time()-t))
-# El tiempo de ejecución es 0.159805059433 segundos
+# El tiempo de ejecución es 0.3952729702 segundos
 
 # d) Usando la función filter de los RDD de Spark, obtenga sólo las películas con 100 o más ratings.
-hundredAverageRaiting = getBestRaiting(bestAverageRaiting)
-bestMovie = ordering(hundredAverageRaiting, False)
+filteredMovies = getBestRaiting(bestAverageRaiting)
+hundredAverageRaiting = ordering(filteredMovies, False)
 ratingsData.count() # total de las peluculas
-bestMovie.count() # peliculas filtradas
+hundredAverageRaiting.count() # peliculas filtradas
 
 # ¿Cuáles son las 10 películas con menor cantidad de ratings de las películas filtradas?
-tenWorseBestMovie = ordering(hundredAverageRaiting, True)
-tenWorseBestMovie.take(10)
+worseMovies = joinData(sc.parallelize(filteredMovies.take(filteredMovies.count())), pairsMovie)
+ordering(worseMovies, True).take(10)
+
+tenWorseBestMovie.collect()
