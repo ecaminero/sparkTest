@@ -127,4 +127,3 @@ hundredAverageRaiting.count() # peliculas filtradas
 worseMovies = joinData(sc.parallelize(filteredMovies.take(filteredMovies.count())), pairsMovie)
 ordering(worseMovies, True).take(10)
 
-tenWorseBestMovie.collect()
